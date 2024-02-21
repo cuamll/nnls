@@ -20,7 +20,7 @@ endif
 OBJECTS = $(SOURCES:.f=.o)
 
 %.o: %.f
-	$(CC) $(FLAGS) $(CFLAGS) $(DFLAGS) -c $<
+	$(CC) $(FLAGS) $(CFLAGS) $(RFLAGS) -c $<
 
 .PHONY: clean
 
