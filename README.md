@@ -13,4 +13,4 @@ this generates a set of 1000 matrices $A$ of random dimensions $`m \times n \tex
 
 note that there might be multiple solutions of the equations it generates; for each iteration it prints a.) `res` $`= \left|Ax - b\right|`$ and b.) $`\left|x_{\text{ref}} - x\right|`$ to stdout so you can check whether a.) the solution is reasonable and b.) whether it's the same solution or not.
 
-any set of equations for which the maximum number of iterations is reached (currently set to $3n$ as in the scipy implementation) or the norm $\left|Ax - b\right| > \epsilon = 1\times10^{-6}$ the program will attempt to write an output file with a load of relevant details.
+any set of equations for which the maximum number of iterations is reached (currently set to $3n$ as in the scipy implementation) or the norm $\left|Ax - b\right| > \epsilon = 1\times10^{-6}$ will be counted as a failure; the program will attempt to write an output file with a load of relevant details. at the end it will print the number of failures and the time taken.
