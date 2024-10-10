@@ -9,6 +9,7 @@
 module nnls
   use iso_fortran_env
   use iso_c_binding
+  use, intrinsic :: ieee_arithmetic
   implicit none
   public :: update_s, solve
   integer, parameter :: CF = c_double
@@ -16,6 +17,16 @@ module nnls
   integer, parameter :: CB = c_bool
 
   contains
+
+    pure function inf_pos() result(r)
+      real(kind=CF) :: r
+      r = ieee_value(r, ieee_positive_inf)
+    end function inf_pos
+
+    pure function inf_neg() result(r)
+      real(kind=CF) :: r
+      r = ieee_value(r, ieee_negative_inf)
+    end function inf_neg
 
     subroutine update_s(s, ata, atb, pr, n, n_true, s_p_min)&
         bind(C, name='update_s')
@@ -53,7 +64,7 @@ module nnls
       call dsysv("U", n_true, 1, atap, n_true,&
                  ipiv, atbp, n_true, work, lwork, info)
       ! atbp is now s[p]
-      s_p_min = huge(0.0_CF)
+      s_p_min = inf_pos()
       do i = 1, n_true
         s(p_i(i)) = atbp(i)
         if (s(p_i(i)).lt.s_p_min) then
@@ -104,7 +115,7 @@ module nnls
         (any(merge(resid, 0.0_CF,&
         (pr.eqv..false._CB)).gt.tol)))
 
-        where (pr) resid = -huge(0.0_CF)
+        where (pr) resid = inf_neg()
         k = maxloc(resid, 1, kind=CI)
         pr(k) = .true._CB ! must specify dim to get scalar
 
@@ -113,7 +124,7 @@ module nnls
 
         do while ((iter.lt.maxiter).and.(s_p_min.le.tol))
 
-          alpha_min = huge(0.0_CF)
+          alpha_min = inf_pos()
           do i = 1, n
             if ((pr(i)).and.s(i).le.tol) then
               alpha = (x(i) / (x(i) - s(i))) 
