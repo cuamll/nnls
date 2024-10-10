@@ -75,13 +75,20 @@ module nnls
 
     end subroutine update_s
 
+    !> NNLS solver (cf. refs above).
+    !! Solves the system of equations $ Ax = b $,
+    !! where $A$ is an $ m \times n $ matrix, $b$ is an $m$-vector
+    !! and $x$ is an $n$-vector.
+    !! If $x$ contains any data on input it will be overwritten.
+    !! res will contain the norm $|Ax - b|$.
+    !! mode will be 0 on success and -1 on failure.
     subroutine solve(A, b, x, m, n, mode, res, maxiter, tol)&
         bind(C, name='solve')
       implicit none
       integer(kind=CI) :: m, n, iter, i, mode, k, maxiter
       real(kind=CF) :: tol, s_p_min, alpha, alpha_min, res
-      real(kind=CF), dimension(m, n) :: A
-      real(kind=CF), dimension(m) :: b
+      real(kind=CF), dimension(m, n) :: A !< equation matrix
+      real(kind=CF), dimension(m) :: b 
       real(kind=CF), dimension(n) :: x
       real(kind=CF), dimension(:, :), allocatable :: ata
       real(kind=CF), dimension(:), allocatable :: atb, resid, s
@@ -145,8 +152,8 @@ module nnls
         x = s
         resid = atb - matmul(ata, x)
         if (iter.ge.maxiter) then
-          x = 0.0_CF
-          res = 0.0_CF
+          x = inf_pos()
+          res = inf_pos()
           mode = -1_CI
           deallocate(ata)
           deallocate(atb)

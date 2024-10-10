@@ -4,7 +4,7 @@ program main
   implicit none
   integer(kind=CI) :: i, j, k, n, m, maxdim, mode, maxiter, failures, outunit
   integer(kind=c_long) ::  start_time, end_time, count_rate
-  real(kind=CF) :: r, res, tol, diff, xdiff
+  real(kind=CF) :: r, res, tol, xdiff
   real(kind=CF), dimension(:), allocatable :: b, x, x_ref
   real(kind=CF), dimension(:, :), allocatable :: a
   character(len=100) :: outfile
@@ -32,9 +32,8 @@ program main
     call random_number(x_ref)
     b = matmul(a, x_ref)
     call solve(a, b, x, m, n, mode, res, maxiter, tol)
-    diff = norm2(matmul(A, x) - b)
     xdiff = norm2(x_ref - x)
-    if ((mode.eq.-1_CI).or.(diff.gt.tol)) then
+    if ((mode.eq.-1_CI).or.(res.gt.tol)) then
       write(outfile, '(a, i0.4, a)') "out/info_", i, ".txt"
       open(newunit=outunit, file=outfile)
       failures = failures + 1
@@ -49,11 +48,11 @@ program main
       write(outunit, *)
       write(outunit, *) "Ax = ", matmul(A, x)
       write(outunit, *) "b = ", b
-      write(outunit, *) "diff = ", diff
+      write(outunit, *) "res = ", res
       close(outunit)
     else
       write(*, '(a, i4, a, G10.3, a, G10.3)') "i = ", i,&
-        ": |Ax - b| = ", diff, ", |x_ref - x| = ", xdiff
+        ": |Ax - b| = ", res, ", |x_ref - x| = ", xdiff
     end if
     deallocate(b)
     deallocate(x)
